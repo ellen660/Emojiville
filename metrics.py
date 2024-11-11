@@ -20,9 +20,10 @@ class MulticlassMetrics():
 
     def fill_metrics(self, raw_predictions, raw_labels):
         # Convert raw predictions to probabilities and get predicted classes
-        raw_pred = torch.softmax(raw_predictions, dim=1)
-        predictions = torch.argmax(raw_pred, dim=1)
-        labels = raw_labels
+        predictions = torch.softmax(raw_predictions, dim=1)
+        predictions = torch.argmax(predictions, dim=1)
+        labels = torch.argmax(raw_labels, dim=1)
+        # breakpoint()
 
         # Update metrics
         self.classifier_metrics_dict["acc"].update(predictions, labels)
@@ -53,3 +54,32 @@ class MulticlassMetrics():
             metric.reset()
         self.used_keys = {}
 
+
+if __name__ == "__main__":
+    y = torch.tensor([[0., 0., 1.],
+        [0., 1., 0.],
+        [1., 0., 0.],
+        [1., 0., 0.],
+        [1., 0., 0.],
+        [1., 0., 0.],
+        [1., 0., 0.],
+        [1., 0., 0.],
+        [0., 0., 1.],
+        [0., 0., 1.]])
+    
+    y_pred = torch.tensor([[ 0.0183,  0.0983,  0.0312],
+        [ 0.0353,  0.0725,  0.0136],
+        [ 0.0222,  0.0433,  0.0121],
+        [-0.0441,  0.3260,  0.1144],
+        [-0.1817,  0.5961,  0.1830],
+        [ 0.0222,  0.0433,  0.0121],
+        [ 0.0190,  0.1135,  0.0246],
+        [ 0.0222,  0.0433,  0.0121],
+        [ 0.0162,  0.0622,  0.0173],
+        [ 0.0263,  0.0617,  0.0220]])
+    
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    num_classes = 3
+    metrics = MulticlassMetrics(device, num_classes)
+
+    metrics.fill_metrics(y_pred, y)
