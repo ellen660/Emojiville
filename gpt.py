@@ -109,6 +109,8 @@ class SentimentDataset(Dataset):
 
         # Create one-hot encoding with 3 classes
         one_hot_label = F.one_hot(mapped_label, num_classes=3)
+        #convert to float
+        one_hot_label = one_hot_label.type(torch.float32)
         # breakpoint()
         
         return emoji_embeddings, one_hot_label
@@ -121,6 +123,7 @@ if __name__ == "__main__":
     dataset = SentimentDataset(csv_file, debug=True)
 
     feature, label = dataset.__getitem__(0)
+    print(f'label: {label}')
     dataset.__getitem__(1)
     dataset.__getitem__(2)
     dataset.__getitem__(3)
