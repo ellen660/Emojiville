@@ -5,6 +5,7 @@ import re
 from torch.utils.data import Dataset, DataLoader
 import tiktoken
 import ast
+import torch.nn.functional as F
 
 # Set your OpenAI API key here
 openai.api_key = "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"
@@ -102,9 +103,15 @@ class SentimentDataset(Dataset):
         
         # Convert sentiment label to tensor
         sentiment_label = torch.tensor(sentiment, dtype=torch.long)
-        # breakpoint()
+
+        # Convert labels from [-1, 0, 1] to [0, 1, 2]
+        mapped_label = sentiment_label + 1
+
+        # Create one-hot encoding with 3 classes
+        one_hot_label = F.one_hot(mapped_label, num_classes=3)
+        breakpoint()
         
-        return emoji_embeddings, sentiment_label
+        return emoji_embeddings, one_hot_label
     
 if __name__ == "__main__":
 
@@ -114,9 +121,12 @@ if __name__ == "__main__":
     dataset = SentimentDataset(csv_file, debug=True)
 
     feature, label = dataset.__getitem__(0)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-    # # Loop through the dataloader
-    for features, labels in dataloader:
-        print("Features (Emoji embeddings):", features.shape)
-        print("Labels (Sentiment):", labels.shape)
-        break
+    dataset.__getitem__(1)
+    dataset.__getitem__(2)
+    dataset.__getitem__(3)
+    # dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    # # # Loop through the dataloader
+    # for features, labels in dataloader:
+    #     print("Features (Emoji embeddings):", features.shape)
+    #     print("Labels (Sentiment):", labels)
+    #     break
