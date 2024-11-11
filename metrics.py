@@ -1,22 +1,21 @@
 import torchmetrics
 import torch
-from dataclasses import dataclass
 
 class MulticlassMetrics():
-    def __init__(self, args):
-        self.args = args
+    def __init__(self, device, num_classes):
+        self.device = device
         self.used_keys = {}
-        self.num_classes = args.num_classes
+        self.num_classes = num_classes
         self.init_metrics()
 
     def init_metrics(self):
         # Initialize metrics for multiclass classification
         self.classifier_metrics_dict = {
-            "acc": torchmetrics.Accuracy(task='multiclass', num_classes=self.num_classes).to(self.args.device),
-            # "kappa": torchmetrics.CohenKappa(task='multiclass', num_classes=self.num_classes).to(self.args.device),
-            "prec": torchmetrics.Precision(task='multiclass', num_classes=self.num_classes, average="macro").to(self.args.device),
-            "recall": torchmetrics.Recall(task='multiclass', num_classes=self.num_classes, average="macro").to(self.args.device),
-            "f1": torchmetrics.F1Score(task='multiclass', num_classes=self.num_classes, average="macro").to(self.args.device),
+            "acc": torchmetrics.Accuracy(task='multiclass', num_classes=self.num_classes).to(self.device),
+            # "kappa": torchmetrics.CohenKappa(task='multiclass', num_classes=self.num_classes).to(self.device),
+            "prec": torchmetrics.Precision(task='multiclass', num_classes=self.num_classes, average="macro").to(self.device),
+            "recall": torchmetrics.Recall(task='multiclass', num_classes=self.num_classes, average="macro").to(self.device),
+            "f1": torchmetrics.F1Score(task='multiclass', num_classes=self.num_classes, average="macro").to(self.device),
         }
 
     def fill_metrics(self, raw_predictions, raw_labels):
@@ -45,7 +44,7 @@ class MulticlassMetrics():
             metrics[item] = self.classifier_metrics_dict[item].compute()
 
         if loss != 0:
-            metrics["loss_bce"] = loss
+            metrics["loss_cross_entropy"] = loss
 
         return metrics
 
@@ -54,7 +53,3 @@ class MulticlassMetrics():
             metric.reset()
         self.used_keys = {}
 
-@dataclass
-class MetricsArgs:
-    num_classes: int
-    device: str
