@@ -109,7 +109,7 @@ class SentimentDataset(Dataset):
 
         # Create one-hot encoding with 3 classes
         one_hot_label = F.one_hot(mapped_label, num_classes=3)
-        breakpoint()
+        # breakpoint()
         
         return emoji_embeddings, one_hot_label
     
